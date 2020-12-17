@@ -1,0 +1,6 @@
+﻿name,type,criteria
+Webサイトの有無,check_column,website
+再生可能/自然エネルギーに関する方針の有無,content_exist,再生可能エネルギー 自然エネルギー
+方針の内容,content_extract,再生可能エネルギー 自然エネルギー
+目標の有無,content_exist,% パーセント
+目標,content_extract,% パーセント
