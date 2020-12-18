@@ -31,42 +31,67 @@ def get_download_link(df, file_name, file_label):
 
 # Application
 
-st.title("Sustainability Data Labo")
+st.markdown(""""
+# データ収集ポータル(仮)
+
+## 利用手順
+
+1. 項目定義のアップロード
+    * 収集したいデータの項目と、収集方法を定義したファイルをアップロードします
+2. 収集対象会社の選択
+    * 収集したい対象の会社を選択します
+3. ダウンロード
+    * 結果をダウンロードします。
+
+## 1. 項目定義のアップロード
+
+収集したいデータの項目と、収集方法を定義したファイルをアップロードします。  
+事前に伺った自然エネルギーについて、項目定義を行ったファイルをすでに作成しています。  
+以下のリンクからダウンロードできますので、ダウンロードした後そのままアップロードしてみてください。
+
+"""
+)
 
 # Upload Criteria
-
-st.write("正規化の定義をアップロードしてください")
-st.markdown("""
-* name: チェック項目の名称
-* type: チェック方法
-* criteria: チェック条件(検索のためのキーワードなど)
-
-以下からサンプルの定義書をダウンロードできるので、それを使うことも可能です。
-""")
 
 criteria_path = os.path.join(os.path.dirname(__file__), "./criteria.csv")
 criteria_link = get_download_link(
                     pd.read_csv(criteria_path, index_col=False), 
-                    "criteria.csv", "サンプル定義書")
+                    "criteria.csv", "サンプル項目定義書")
 st.markdown(criteria_link, unsafe_allow_html=True)
 
-uploaded = st.file_uploader("Upload Normalize Definition", type=["csv"])
+uploaded = st.file_uploader("アップロードはこちらから", type=["csv"])
 
 if uploaded is not None:
     criteria = pd.read_csv(uploaded, index_col=False)
     st.dataframe(criteria)
 
+st.markdown("""
+ちなみに、項目定義の各項目の名前と意味は以下のようになっています。  
+※現時点では暫定版です。
+
+* name: チェック項目の名称
+* type: チェック方法
+* criteria: チェック条件(検索のためのキーワードなど)
+
+""")
+
 # Select Target
 
-st.write("データを取得したい会社を選択してください。")
 st.markdown("""
-※今のところ以下の会社のみデータを入れています。
+## 2. 収集対象会社の選択
+
+データを収集したい対象の会社を選択します。  
+※今のところ以下の会社のみ取得可能です。
+
 * TIS株式会社
 * エヌ・ティ・ティデータ株式会社
-""")
-selected_indices = st.multiselect("Select companies:", companies.name_ja.tolist())
-selecteds = companies[companies["name_ja"].isin(selected_indices)]
 
+⇒選択した後、少し時間がたつと収集結果が表示されます。
+
+""")
+selected_indices = st.multiselect("対象会社の選択:", companies.name_ja.tolist())
+selecteds = companies[companies["name_ja"].isin(selected_indices)]
 
 # Normalize
 def search(source, query):
@@ -125,5 +150,21 @@ normalized = pd.DataFrame(normalized)
 
 if len(normalized) > 0:
     st.dataframe(normalized)
+
+st.markdown("""
+## 3. ダウンロード
+
+収集した結果をCSVでダウンロード可能です。  
+
+""")
+
+if len(normalized) > 0:
     link = get_download_link(normalized, "normalized_result.csv", "収集整理結果")
     st.markdown(link, unsafe_allow_html=True)
+
+st.markdown("""
+CSVはUTF-8でエンコードされているため、Excelで開く際は以下手順で開く必要があります(お手数をおかけします)。
+
+http://www4.synapse.ne.jp/yone/excel2019/excel2019_csv_utf8_2.html
+
+""")
